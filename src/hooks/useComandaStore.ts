@@ -238,22 +238,87 @@ export function useComandaStore() {
       fim = new Date(hoje.getFullYear(), hoje.getMonth(), 4);
     }
 
+    // Comandas fechadas no período (dia atual)
     const vendasPeriodo = comandasFechadas.filter(c => {
       const dataFechamento = new Date(c.fechadaEm);
       return dataFechamento >= inicio && dataFechamento <= fim;
     });
 
+    // Histórico salvo no período
     const historicoNoPeriodo = historico.filter(h => {
       const data = new Date(h.data);
       return data >= inicio && data <= fim;
     });
 
+    // Perdas no período
+    const perdasPeriodo = perdas.filter(p => {
+      const dataPerda = new Date(p.horario);
+      return dataPerda >= inicio && dataPerda <= fim;
+    });
+
+    // Calcular totais do histórico
     const totalVendasHistorico = historicoNoPeriodo.reduce((acc, h) => acc + h.vendas, 0);
     const totalComandasHistorico = historicoNoPeriodo.reduce((acc, h) => acc + h.comandas, 0);
 
+    // Calcular totais das vendas do dia atual no período
     const totalVendasHoje = vendasPeriodo.reduce((acc, c) => acc + c.total, 0);
+    const totalTaxasHoje = vendasPeriodo.reduce((acc, c) => acc + c.taxaAplicada, 0);
     const totalComandas = vendasPeriodo.length + totalComandasHistorico;
     const totalVendas = totalVendasHoje + totalVendasHistorico;
+
+    // Total de perdas
+    const totalPerdas = perdasPeriodo.reduce((acc, p) => acc + p.custoTotal, 0);
+
+    // Por forma de pagamento (do dia atual no período)
+    const porFormaPagamento = vendasPeriodo.reduce((acc, c) => {
+      if (!acc[c.formaPagamento]) {
+        acc[c.formaPagamento] = { comandas: 0, valor: 0, taxas: 0 };
+      }
+      acc[c.formaPagamento].comandas++;
+      acc[c.formaPagamento].valor += c.total;
+      acc[c.formaPagamento].taxas += c.taxaAplicada;
+      return acc;
+    }, {} as Record<string, { comandas: number; valor: number; taxas: number }>);
+
+    // Adicionar dados do histórico às formas de pagamento
+    historicoNoPeriodo.forEach(h => {
+      Object.entries(h.porFormaPagamento).forEach(([forma, dados]) => {
+        if (!porFormaPagamento[forma]) {
+          porFormaPagamento[forma] = { comandas: 0, valor: 0, taxas: 0 };
+        }
+        porFormaPagamento[forma].comandas += dados.comandas;
+        porFormaPagamento[forma].valor += dados.valor;
+      });
+    });
+
+    // Produtos vendidos (do dia atual no período)
+    const produtosVendidos = vendasPeriodo
+      .flatMap(c => c.itens)
+      .reduce((acc, item) => {
+        if (!acc[item.nome]) {
+          acc[item.nome] = { quantidade: 0, valor: 0 };
+        }
+        acc[item.nome].quantidade += item.quantidade;
+        acc[item.nome].valor += item.preco * item.quantidade;
+        return acc;
+      }, {} as Record<string, { quantidade: number; valor: number }>);
+
+    const produtosOrdenados = Object.entries(produtosVendidos)
+      .sort((a, b) => b[1].quantidade - a[1].quantidade);
+
+    // Calcular custo total (para lucro)
+    const custoTotal = vendasPeriodo
+      .flatMap(c => c.itens)
+      .reduce((acc, item) => {
+        const itemEstoque = estoque.find(e => e.nome === item.nome);
+        if (itemEstoque) {
+          return acc + (itemEstoque.precoCusto * item.quantidade);
+        }
+        return acc;
+      }, 0);
+
+    // Lucro = Faturamento - Taxas - Custo - Perdas
+    const lucro = totalVendas - totalTaxasHoje - custoTotal - totalPerdas;
 
     return {
       inicio: inicio.toISOString().split('T')[0],
@@ -262,6 +327,12 @@ export function useComandaStore() {
       totalComandas,
       ticketMedio: totalComandas > 0 ? totalVendas / totalComandas : 0,
       historicoDiario: historicoNoPeriodo,
+      totalTaxas: totalTaxasHoje,
+      totalPerdas,
+      custoTotal,
+      lucro,
+      porFormaPagamento,
+      produtosVendidos: produtosOrdenados,
     };
   };
 
