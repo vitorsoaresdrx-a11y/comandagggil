@@ -77,9 +77,9 @@ export function ComandasTab({
       <NovaComandaModal
         open={showNova}
         onClose={() => setShowNova(false)}
-        onConfirm={async (cliente) => {
-          const nova = await onCriar(cliente);
-          setComandaAberta(nova.id);
+        onCreated={async () => {
+          // Refresh will happen via React Query
+          setShowNova(false);
         }}
       />
     </div>
