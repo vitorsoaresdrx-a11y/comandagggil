@@ -1,0 +1,25 @@
+import { supabase } from '@/lib/supabase'
+import { ItemComanda } from '@/types/comanda'
+
+export async function salvarItensComanda(
+  comandaId: number,
+  itens: ItemComanda[]
+) {
+  // 1. Apaga itens antigos
+  await supabase
+    .from('comanda_itens')
+    .delete()
+    .eq('comanda_id', comandaId)
+
+  // 2. Insere os novos itens
+  const payload = itens.map(item => ({
+    comanda_id: comandaId,
+    nome: item.nome,
+    preco: item.preco,
+    quantidade: item.quantidade,
+  }))
+
+  return supabase
+    .from('comanda_itens')
+    .insert(payload)
+}
