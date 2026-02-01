@@ -7,7 +7,7 @@ import { EstoqueTab } from '@/components/estoque/EstoqueTab';
 import { PerdasTab } from '@/components/perdas/PerdasTab';
 import { TaxasTab } from '@/components/taxas/TaxasTab';
 import { RelatoriosTab } from '@/components/relatorios/RelatoriosTab';
-import { useComandaStore } from '@/hooks/useComandaStore';
+import { useSupabaseStore } from '@/hooks/useSupabaseStore';
 import { FormaPagamento } from '@/types/comanda';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>('comandas');
   
-  const store = useComandaStore();
+  const store = useSupabaseStore();
 
   const handleReset = () => {
     store.resetarDia();

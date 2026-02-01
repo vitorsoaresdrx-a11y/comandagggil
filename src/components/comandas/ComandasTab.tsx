@@ -8,7 +8,7 @@ import { ComandaEditor } from './ComandaEditor';
 
 interface ComandasTabProps {
   comandas: Comanda[];
-  onCriar: (cliente: string) => Comanda;
+  onCriar: (cliente: string) => Promise<Comanda>;
   onAtualizar: (id: number, itens: ItemComanda[]) => void;
   onFechar: (id: number, formaPagamento: FormaPagamento) => void;
   onRemover: (id: number) => void;
@@ -71,8 +71,8 @@ export function ComandasTab({
       <NovaComandaModal
         open={showNova}
         onClose={() => setShowNova(false)}
-        onConfirm={(cliente) => {
-          const nova = onCriar(cliente);
+        onConfirm={async (cliente) => {
+          const nova = await onCriar(cliente);
           setComandaAberta(nova.id);
         }}
       />
