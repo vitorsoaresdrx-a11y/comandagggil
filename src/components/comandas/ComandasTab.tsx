@@ -5,6 +5,7 @@ import { Comanda, ItemComanda, FormaPagamento } from '@/types/comanda';
 import { NovaComandaModal } from './NovaComandaModal';
 import { ComandaCard } from './ComandaCard';
 import { ComandaEditor } from './ComandaEditor';
+import { salvarItensComanda } from '@/comandas';
 
 interface ComandasTabProps {
   comandas: Comanda[];
@@ -26,12 +27,17 @@ export function ComandasTab({
 
   const comandaAtiva = comandas.find(c => c.id === comandaAberta);
 
+  const handleAtualizar = (id: number, itens: ItemComanda[]) => {
+    onAtualizar(id, itens);
+    salvarItensComanda(id, itens);
+  };
+
   if (comandaAtiva) {
     return (
       <ComandaEditor
         comanda={comandaAtiva}
         onBack={() => setComandaAberta(null)}
-        onUpdate={onAtualizar}
+        onUpdate={handleAtualizar}
         onFechar={onFechar}
         onRemover={(id) => {
           onRemover(id);
