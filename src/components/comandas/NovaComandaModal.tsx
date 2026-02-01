@@ -8,18 +8,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
 
 interface NovaComandaModalProps {
   open: boolean;
   onClose: () => void;
-  onCreated?: () => void;
+  onConfirm: (cliente: string) => Promise<void>;
 }
 
 export function NovaComandaModal({
   open,
   onClose,
-  onCreated,
+  onConfirm,
 }: NovaComandaModalProps) {
   const [cliente, setCliente] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,21 +29,14 @@ export function NovaComandaModal({
 
     setLoading(true);
 
-    const { error } = await supabase.from('comandas').insert({
-      cliente: cliente.trim(),
-      status: 'aberta',
-      total: 0,
-      criada_em: new Date().toISOString(),
-    });
-
-    setLoading(false);
-
-    if (!error) {
+    try {
+      await onConfirm(cliente.trim());
       setCliente('');
       onClose();
-      onCreated?.();
-    } else {
+    } catch (error) {
       alert('Erro ao criar comanda. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
