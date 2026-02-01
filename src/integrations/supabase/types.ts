@@ -14,7 +14,195 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      comandas: {
+        Row: {
+          cliente: string
+          criada_em: string
+          id: number
+          itens: Json
+          total: number
+        }
+        Insert: {
+          cliente: string
+          criada_em?: string
+          id?: number
+          itens?: Json
+          total?: number
+        }
+        Update: {
+          cliente?: string
+          criada_em?: string
+          id?: number
+          itens?: Json
+          total?: number
+        }
+        Relationships: []
+      }
+      comandas_fechadas: {
+        Row: {
+          cliente: string
+          comanda_id: number
+          criada_em: string
+          fechada_em: string
+          forma_pagamento: string
+          id: number
+          itens: Json
+          taxa_aplicada: number
+          total: number
+        }
+        Insert: {
+          cliente: string
+          comanda_id: number
+          criada_em: string
+          fechada_em?: string
+          forma_pagamento: string
+          id?: number
+          itens?: Json
+          taxa_aplicada?: number
+          total?: number
+        }
+        Update: {
+          cliente?: string
+          comanda_id?: number
+          criada_em?: string
+          fechada_em?: string
+          forma_pagamento?: string
+          id?: number
+          itens?: Json
+          taxa_aplicada?: number
+          total?: number
+        }
+        Relationships: []
+      }
+      configuracoes: {
+        Row: {
+          estoque_configurado: boolean
+          id: number
+          proximo_numero: number
+          updated_at: string
+        }
+        Insert: {
+          estoque_configurado?: boolean
+          id?: number
+          proximo_numero?: number
+          updated_at?: string
+        }
+        Update: {
+          estoque_configurado?: boolean
+          id?: number
+          proximo_numero?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      estoque: {
+        Row: {
+          created_at: string
+          id: number
+          nome: string
+          preco_custo: number
+          preco_venda: number
+          quantidade: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          nome: string
+          preco_custo?: number
+          preco_venda?: number
+          quantidade?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          nome?: string
+          preco_custo?: number
+          preco_venda?: number
+          quantidade?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      historico_diario: {
+        Row: {
+          comandas: number
+          created_at: string
+          data: string
+          id: number
+          por_forma_pagamento: Json
+          ticket_medio: number
+          vendas: number
+        }
+        Insert: {
+          comandas?: number
+          created_at?: string
+          data: string
+          id?: number
+          por_forma_pagamento?: Json
+          ticket_medio?: number
+          vendas?: number
+        }
+        Update: {
+          comandas?: number
+          created_at?: string
+          data?: string
+          id?: number
+          por_forma_pagamento?: Json
+          ticket_medio?: number
+          vendas?: number
+        }
+        Relationships: []
+      }
+      perdas: {
+        Row: {
+          custo_total: number
+          horario: string
+          id: string
+          produto: string
+          quantidade: number
+        }
+        Insert: {
+          custo_total: number
+          horario?: string
+          id?: string
+          produto: string
+          quantidade: number
+        }
+        Update: {
+          custo_total?: number
+          horario?: string
+          id?: string
+          produto?: string
+          quantidade?: number
+        }
+        Relationships: []
+      }
+      taxas: {
+        Row: {
+          credito: number
+          debito: number
+          id: number
+          pix: number
+          updated_at: string
+        }
+        Insert: {
+          credito?: number
+          debito?: number
+          id?: number
+          pix?: number
+          updated_at?: string
+        }
+        Update: {
+          credito?: number
+          debito?: number
+          id?: number
+          pix?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
