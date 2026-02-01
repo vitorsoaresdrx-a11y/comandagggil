@@ -8,22 +8,43 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { supabase } from '@/lib/supabase';
 
 interface NovaComandaModalProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (cliente: string) => void;
+  onCreated?: () => void;
 }
 
-export function NovaComandaModal({ open, onClose, onConfirm }: NovaComandaModalProps) {
+export function NovaComandaModal({
+  open,
+  onClose,
+  onCreated,
+}: NovaComandaModalProps) {
   const [cliente, setCliente] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (cliente.trim()) {
-      onConfirm(cliente.trim());
+    if (!cliente.trim()) return;
+
+    setLoading(true);
+
+    const { error } = await supabase.from('comandas').insert({
+      cliente: cliente.trim(),
+      status: 'aberta',
+      total: 0,
+      criada_em: new Date().toISOString(),
+    });
+
+    setLoading(false);
+
+    if (!error) {
       setCliente('');
       onClose();
+      onCreated?.();
+    } else {
+      alert('Erro ao criar comanda. Tente novamente.');
     }
   };
 
@@ -48,8 +69,8 @@ export function NovaComandaModal({ open, onClose, onConfirm }: NovaComandaModalP
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={!cliente.trim()}>
-              Criar Comanda
+            <Button type="submit" disabled={!cliente.trim() || loading}>
+              {loading ? 'Criando...' : 'Criar Comanda'}
             </Button>
           </div>
         </form>
