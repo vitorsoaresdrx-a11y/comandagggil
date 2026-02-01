@@ -1,0 +1,23 @@
+import { supabase } from './supabaseClient'
+
+export default function TesteSupabase() {
+
+  async function testar() {
+    const { data, error } = await supabase.from('testes').select('*')
+    
+    if(error) {
+      alert('Erro: ' + JSON.stringify(error))
+    } else {
+      alert('Conectado! Linhas: ' + JSON.stringify(data))
+    }
+  }
+
+  testar()
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>Testando Supabase…</h1>
+      <p>Um alerta vai aparecer mostrando se está funcionando</p>
+    </div>
+  )
+}
